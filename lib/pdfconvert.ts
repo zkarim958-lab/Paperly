@@ -113,7 +113,7 @@ function toRows(boxes: TextBox[]): Row[] {
 }
 
 async function zipBytes(zip: JSZip): Promise<Uint8Array> {
-  return zip.generateAsync({ type: "uint8array", compression: "DEFLATE", compressionLevel: 6 });
+  return zip.generateAsync({ type: "uint8array", compression: "DEFLATE" });
 }
 
 /* ==================================================================== WORD */
