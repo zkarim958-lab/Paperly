@@ -1,0 +1,181 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    color-scheme: light;
+    font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  ::selection {
+    background: rgb(234 88 12 / 0.22);
+  }
+  .dark ::selection {
+    background: rgb(251 146 60 / 0.4);
+  }
+  body {
+    background-image:
+      radial-gradient(70rem 28rem at 50% -8rem, rgb(251 146 60 / 0.22), transparent 70%),
+      radial-gradient(50rem 24rem at 100% 100%, rgb(253 186 116 / 0.18), transparent 70%);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+  html.dark body {
+    background-image: radial-gradient(70rem 30rem at 50% -8rem, rgb(234 88 12 / 0.22), transparent 70%);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ----------------------------------------------------------------------
+ * 3D LOOK: raised buttons with a solid bottom edge that press down, cards
+ * with a lit top edge and a soft long shadow, and cards that tilt on hover.
+ * Plain CSS after the Tailwind output so these win over utility classes.
+ * -------------------------------------------------------------------- */
+
+.accent3d {
+  background-image: linear-gradient(180deg, #fb923c 0%, #ea580c 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4), inset 0 -2px 0 rgb(154 52 18 / 0.35), 0 4px 10px -2px rgb(194 65 12 / 0.45);
+  color: #fff;
+}
+
+.btn3d {
+  background-image: linear-gradient(180deg, #fb923c 0%, #ea580c 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45), 0 5px 0 #9a3412, 0 12px 20px -6px rgb(154 52 18 / 0.5);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  text-shadow: 0 1px 0 rgb(154 52 18 / 0.45);
+}
+.btn3d:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45), 0 7px 0 #9a3412, 0 16px 24px -6px rgb(154 52 18 / 0.55);
+}
+.btn3d:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 1px 0 #9a3412, 0 3px 6px -2px rgb(154 52 18 / 0.4);
+}
+
+.btn3d-sec {
+  background-image: linear-gradient(180deg, #ffffff 0%, #fff4ea 100%);
+  border-color: #fed7aa;
+  box-shadow: inset 0 1px 0 #fff, 0 4px 0 #fdba74, 0 10px 16px -8px rgb(154 52 18 / 0.3);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.btn3d-sec:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: inset 0 1px 0 #fff, 0 6px 0 #fdba74, 0 14px 20px -8px rgb(154 52 18 / 0.35);
+}
+.btn3d-sec:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: inset 0 1px 0 #fff, 0 1px 0 #fdba74;
+}
+
+.card3d {
+  background-image: linear-gradient(180deg, #ffffff 0%, #fffaf5 100%);
+  border-color: #fde4cf;
+  box-shadow: inset 0 1px 0 #fff, 0 3px 0 #fbd5b0, 0 18px 32px -16px rgb(154 52 18 / 0.28);
+}
+
+.tilt3d {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transform-style: preserve-3d;
+}
+.tilt3d:hover {
+  transform: perspective(800px) rotateX(5deg) rotateY(-5deg) translateY(-6px);
+  box-shadow: inset 0 1px 0 #fff, 0 6px 0 #fbd5b0, 0 28px 40px -14px rgb(154 52 18 / 0.4);
+}
+
+html.dark .btn3d-sec {
+  background-image: linear-gradient(180deg, #2a2420 0%, #201b17 100%);
+  border-color: rgb(255 255 255 / 0.12);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 4px 0 #0c0a09, 0 10px 16px -8px rgb(0 0 0 / 0.6);
+}
+html.dark .btn3d-sec:hover:not(:disabled) {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1), 0 6px 0 #0c0a09, 0 14px 20px -8px rgb(0 0 0 / 0.7);
+}
+html.dark .btn3d-sec:active:not(:disabled) {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 1px 0 #0c0a09;
+}
+html.dark .card3d {
+  background-image: linear-gradient(180deg, #221d19 0%, #1a1613 100%);
+  border-color: rgb(255 255 255 / 0.08);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.07), 0 3px 0 #0c0a09, 0 18px 32px -16px rgb(0 0 0 / 0.7);
+}
+html.dark .tilt3d:hover {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1), 0 6px 0 #0c0a09, 0 28px 40px -14px rgb(0 0 0 / 0.8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn3d, .btn3d-sec, .tilt3d { transition: none; }
+  .tilt3d:hover { transform: none; }
+}
+
+/* ---- 3D PDF background (components/pdf-backdrop.tsx) ---- */
+.pdfbg { --sy: 0; perspective: 1100px; }
+.pdfbg-pos {
+  position: absolute;
+  transform-style: preserve-3d;
+  transform: translate3d(0, calc(var(--sy) * var(--speed) * 1px), 0)
+    rotateZ(calc(var(--rot) + var(--sy) * var(--spin) * 1deg));
+  will-change: transform;
+}
+.pdfbg-float { transform-style: preserve-3d; animation: pdfFloat 9s ease-in-out infinite; }
+.pdfbg-sheet {
+  position: relative; aspect-ratio: 3 / 4; border-radius: 10px; padding: 22% 12% 0;
+  display: flex; flex-direction: column; gap: 7%;
+  background: linear-gradient(145deg, #ffffff 0%, #fff1e3 100%);
+  border: 1px solid rgb(234 88 12 / 0.18);
+  opacity: 0.7;
+  transform: rotateX(var(--tx)) rotateY(calc(var(--ty) + var(--sy) * 0.04deg));
+  box-shadow: 1px 1px 0 #fed7aa, 3px 3px 0 #fdba74, 5px 5px 0 #fb923c, 22px 30px 40px -12px rgb(154 52 18 / 0.35);
+  clip-path: polygon(0 0, 78% 0, 100% 22%, 100% 100%, 0 100%);
+}
+.pdfbg-sheet::after {
+  content: ""; position: absolute; top: 0; right: 0; width: 22%; aspect-ratio: 1;
+  background: linear-gradient(225deg, #fed7aa 50%, #fb923c 50%); border-bottom-left-radius: 6px;
+}
+.pdfbg-badge {
+  position: absolute; top: 9%; left: 12%; padding: 2px 8px; border-radius: 6px;
+  font: 800 11px/1.4 system-ui, sans-serif; letter-spacing: .06em; color: #fff;
+  background: linear-gradient(180deg, #fb923c, #ea580c);
+}
+.pdfbg-sheet i { display: block; height: 5px; border-radius: 3px; background: rgb(120 113 108 / 0.28); }
+.pdfbg-sheet i.short { width: 55%; }
+.pdfbg-sheet b { display: block; height: 22%; border-radius: 6px; background: linear-gradient(135deg, #fdba74, #fb923c); opacity: .55; }
+.pdfbg-orb { position: absolute; border-radius: 9999px; filter: blur(70px); }
+.pdfbg-orb-a { width: 340px; height: 340px; left: -80px; top: 20%; background: rgb(251 146 60 / 0.22); transform: translateY(calc(var(--sy) * -0.08px)); }
+.pdfbg-orb-b { width: 420px; height: 420px; right: -120px; top: 55%; background: rgb(249 115 22 / 0.16); transform: translateY(calc(var(--sy) * -0.14px)); }
+@keyframes pdfFloat {
+  0%, 100% { transform: translateY(0) rotateY(0deg); }
+  50% { transform: translateY(-16px) rotateY(10deg); }
+}
+html.dark .pdfbg-sheet {
+  background: linear-gradient(145deg, #2a221c 0%, #1c1713 100%);
+  border-color: rgb(251 146 60 / 0.25); opacity: 0.55;
+  box-shadow: 1px 1px 0 #7c2d12, 3px 3px 0 #9a3412, 5px 5px 0 #c2410c, 22px 30px 40px -12px rgb(0 0 0 / 0.7);
+}
+html.dark .pdfbg-sheet i { background: rgb(255 255 255 / 0.16); }
+html.dark .pdfbg-orb-a { background: rgb(234 88 12 / 0.2); }
+html.dark .pdfbg-orb-b { background: rgb(194 65 12 / 0.18); }
+@media (prefers-reduced-motion: reduce) {
+  .pdfbg-float { animation: none; }
+  .pdfbg-pos { will-change: auto; }
+}
