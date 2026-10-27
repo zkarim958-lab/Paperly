@@ -32,8 +32,7 @@ export const EMPTY_ADSTERRA: AdsterraSite = {
   popunder: "",
 };
 
-const SCRIPT_URL = /^(?:https?:)?\/\/([a-z0-9-]+(?:\.[a-z0-9-]+)+)(\/[\w\-./]*\.js)(?:\?[\w=&%.-]*)?$/i;
-
+const SCRIPT_URL = /^(?:https?:)?\/\/([a-z0-9-]+(?:\.[a-z0-9-]+)+)(\/[\w\-./]+)(?:\?[\w=&%.-]*)?$/i;
 /** "//host/x.js" or "https://host/x.js?y" -> "https://host/x.js", or null if it is not a plain script URL. */
 export function normScriptUrl(raw: string): string | null {
   const m = SCRIPT_URL.exec(raw.trim());
@@ -48,8 +47,7 @@ export function parseAdsterraScript(raw: string): string | null {
   return normScriptUrl(m ? m[1] : t);
 }
 
-const CANON = /^([a-f0-9]{32})\|(\d{2,4})\|(\d{2,4})\|(https:\/\/[^\s|]+\.js)$/;
-
+const CANON = /^([a-f0-9]{32})\|(\d{2,4})\|(\d{2,4})\|(https:\/\/[a-z0-9.-]+\/[\w\-./]+)$/;
 /** Accepts the pasted Banner code or our stored form; returns the stored form, "" for empty, null if unreadable. */
 export function parseAdsterraBanner(raw: string): string | null {
   const t = raw.trim();
