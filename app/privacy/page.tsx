@@ -54,7 +54,7 @@ export default async function PrivacyPage() {
           request. Your document is not sent there. The site operator can host these files on our own domain instead.
         </li>
         <li>
-          <strong>Advertising.</strong> If you allow it, Google AdSense receives data from your browser to show ads (see
+          <strong>Advertising.</strong> If you allow it, Google AdSense or Adsterra receive data from your browser to show ads (see
           section 5).
         </li>
         <li>
@@ -83,6 +83,12 @@ export default async function PrivacyPage() {
         We use Google AdSense to show ads, which keeps the tools free. Google and its partners may use cookies and
         similar technologies to serve and measure ads, and, only if you allow it, to personalise them based on your
         visits to this and other websites.
+      </p>
+      <p>
+        We may also show ads from Adsterra, another advertising network. Adsterra ads and scripts load only after you
+        choose &quot;Accept all&quot; (and never when your browser sends a Global Privacy Control signal). Adsterra may use
+        cookies and similar technologies to serve and measure ads. See{" "}
+        <a href="https://adsterra.com/privacy-policy/" rel="noopener noreferrer" target="_blank">adsterra.com/privacy-policy</a>.
       </p>
       <ul>
         <li>

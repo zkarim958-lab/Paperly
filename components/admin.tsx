@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { AD_SLOT_KEYS, AD_SLOT_LABELS, type AdSlotKey } from "@/lib/site";
+import { AD_SLOT_KEYS, AD_SLOT_LABELS, type AdSlotKey, type AdsterraSite } from "@/lib/site";
 import { btnPrimary, btnSecondary, cx, inputClass } from "@/components/ui";
 
 /*
@@ -23,6 +23,7 @@ type Form = {
   adsenseClient: string;
   adSlots: Record<AdSlotKey, string>;
   useGoogleCmp: boolean;
+  adsterra: AdsterraSite;
 };
 
 type Loaded = { settings: Form; hasLogo: boolean; logo: string; defaults: Form; storage: "supabase" | "redis" | "file" };
@@ -307,6 +308,22 @@ export function AdminApp({ configured }: { configured: boolean }) {
               <span className="block text-xs text-zinc-500 dark:text-zinc-400">Turn on only after enabling it in AdSense &gt; Privacy &amp; messaging. The built-in cookie banner is then hidden.</span>
             </span>
           </label>
+        </Section>
+
+        <Section title="Adsterra (optional)" hint="Paste the code Adsterra gives you. Adsterra ads load only after the visitor taps Accept all, and never when their browser sends a Global Privacy Control signal. A banner set here replaces the AdSense unit in the same place.">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {AD_SLOT_KEYS.map((k) => (
+              <Field key={k} id={`ast-${k}`} label={`Banner: ${AD_SLOT_LABELS[k]}`} help="Paste the full Banner code (both script parts). Use the size shown in the label.">
+                <textarea id={`ast-${k}`} rows={3} className={cx(inputClass, "font-mono text-xs")} value={form.adsterra.banners[k]} placeholder="Paste Adsterra banner code" onChange={(e) => set("adsterra", { ...form.adsterra, banners: { ...form.adsterra.banners, [k]: e.target.value } })} />
+              </Field>
+            ))}
+          </div>
+          <Field id="ast-social" label="Social Bar (optional)" help="Paste the script code. Leave empty to keep it off.">
+            <textarea id="ast-social" rows={2} className={cx(inputClass, "font-mono text-xs")} value={form.adsterra.socialBar} onChange={(e) => set("adsterra", { ...form.adsterra, socialBar: e.target.value })} />
+          </Field>
+          <Field id="ast-pop" label="Popunder (optional, not recommended)" help="Opens a new tab and annoys visitors. It can also stop AdSense from approving the site. Leave empty to keep it off.">
+            <textarea id="ast-pop" rows={2} className={cx(inputClass, "font-mono text-xs")} value={form.adsterra.popunder} onChange={(e) => set("adsterra", { ...form.adsterra, popunder: e.target.value })} />
+          </Field>
         </Section>
 
         <div className="sticky bottom-4 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-zinc-200 bg-white/95 p-4 shadow-xl backdrop-blur dark:border-white/10 dark:bg-zinc-900/95">

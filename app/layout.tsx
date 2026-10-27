@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { AdSenseLoader } from "@/components/consent";
+import { AdSenseLoader, AdsterraLoader } from "@/components/consent";
 import { SiteProvider } from "@/components/site-context";
 import { getLogoInfo, getPublicSite, getSettings } from "@/lib/settings";
 import "./globals.css";
@@ -80,6 +80,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           Individual ad units are rendered by <AdSlot /> in components/ui.tsx.
         */}
           {site.adsenseClient ? <AdSenseLoader /> : null}
+          {site.adsterra.socialBar || site.adsterra.popunder ? <AdsterraLoader /> : null}
         </SiteProvider>
       </body>
     </html>

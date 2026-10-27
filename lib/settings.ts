@@ -17,7 +17,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
-import { AD_SLOT_KEYS, type AdSlotKey, type PublicSite } from "@/lib/site";
+import { AD_SLOT_KEYS, EMPTY_ADSTERRA, parseAdsterraBanner, parseAdsterraScript, type AdSlotKey, type AdsterraSite, type PublicSite } from "@/lib/site";
 
 export type Settings = {
   siteName: string;
@@ -33,6 +33,7 @@ export type Settings = {
   adsenseClient: string;
   adSlots: Record<AdSlotKey, string>;
   useGoogleCmp: boolean;
+  adsterra: AdsterraSite;
 };
 
 type Stored = Partial<Settings> & { logo?: string; logoVersion?: number };
@@ -64,6 +65,7 @@ export function defaultSettings(): Settings {
       belowTools: env("NEXT_PUBLIC_AD_SLOT_BELOW_TOOLS"),
     },
     useGoogleCmp: env("NEXT_PUBLIC_USE_GOOGLE_CMP") === "true",
+    adsterra: { ...EMPTY_ADSTERRA, banners: { ...EMPTY_ADSTERRA.banners } },
   };
 }
 
@@ -135,13 +137,19 @@ async function writeStored(data: Stored): Promise<void> {
 
 function merge(stored: Stored): Settings {
   const d = defaultSettings();
-  const out: Settings = { ...d, adSlots: { ...d.adSlots } };
+  const out: Settings = { ...d, adSlots: { ...d.adSlots }, adsterra: { ...d.adsterra, banners: { ...d.adsterra.banners } } };
   for (const k of Object.keys(d) as (keyof Settings)[]) {
-    if (k === "adSlots") continue;
+    if (k === "adSlots" || k === "adsterra") continue;
     const v = stored[k];
     if (v !== undefined && v !== null) (out as Record<string, unknown>)[k] = v;
   }
   if (stored.adSlots) for (const k of AD_SLOT_KEYS) if (typeof stored.adSlots[k] === "string") out.adSlots[k] = stored.adSlots[k];
+  const a = stored.adsterra;
+  if (a && typeof a === "object") {
+    for (const k of AD_SLOT_KEYS) if (typeof a.banners?.[k] === "string") out.adsterra.banners[k] = a.banners[k];
+    if (typeof a.socialBar === "string") out.adsterra.socialBar = a.socialBar;
+    if (typeof a.popunder === "string") out.adsterra.popunder = a.popunder;
+  }
   return out;
 }
 
@@ -174,6 +182,7 @@ export async function getPublicSite(): Promise<PublicSite> {
     adsenseClient: s.adsenseClient,
     adSlots: s.adSlots,
     useGoogleCmp: s.useGoogleCmp,
+    adsterra: s.adsterra,
   };
 }
 
@@ -239,6 +248,22 @@ export function validate(input: Record<string, unknown>): { patch: Partial<Setti
       slots[k] = v;
     }
     patch.adSlots = slots;
+  }
+
+  if (has("adsterra") && input.adsterra && typeof input.adsterra === "object") {
+    const a = input.adsterra as Record<string, unknown>;
+    const banners = {} as Record<AdSlotKey, string>;
+    const rawB = (a.banners && typeof a.banners === "object" ? a.banners : {}) as Record<string, unknown>;
+    for (const k of AD_SLOT_KEYS) {
+      const r = parseAdsterraBanner(str(rawB[k], 2000));
+      if (r === null) throw new ValidationError(`Adsterra banner code for "${k}" could not be read. Paste the full Banner code from Adsterra (the two <script> parts).`);
+      banners[k] = r;
+    }
+    const social = parseAdsterraScript(str(a.socialBar, 2000));
+    if (social === null) throw new ValidationError("The Social Bar code could not be read. Paste the <script src=...> code from Adsterra.");
+    const pop = parseAdsterraScript(str(a.popunder, 2000));
+    if (pop === null) throw new ValidationError("The Popunder code could not be read. Paste the <script src=...> code from Adsterra.");
+    patch.adsterra = { banners, socialBar: social, popunder: pop };
   }
 
   let logo: string | null | undefined;

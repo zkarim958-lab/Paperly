@@ -140,3 +140,50 @@ export function openCookieSettings() {
   }
   window.dispatchEvent(new Event("open-cookie-settings"));
 }
+
+/* ------------------------------------------------------------- Adsterra */
+
+/** Adsterra ads (and its scripts) load only after "Accept all", and never when Global Privacy Control is on. */
+export function adsterraAllowed(): boolean {
+  return readConsent() === "all" && !gpcOn();
+}
+
+export function useAdsterraOk(): boolean {
+  const [ok, setOk] = useState(false);
+  useEffect(() => {
+    const update = () => setOk(adsterraAllowed());
+    update();
+    window.addEventListener(CONSENT_EVENT, update);
+    return () => window.removeEventListener(CONSENT_EVENT, update);
+  }, []);
+  return ok;
+}
+
+/** Adds the optional Social Bar / Popunder scripts once the visitor accepted. */
+export function AdsterraLoader() {
+  const ok = useAdsterraOk();
+  const { adsterra } = useSite();
+  useEffect(() => {
+    if (!ok) return;
+    for (const [id, src] of [["adsterra-social", adsterra.socialBar], ["adsterra-pop", adsterra.popunder]] as const) {
+      if (!src || document.getElementById(id)) continue;
+      const s = document.createElement("script");
+      s.id = id;
+      s.async = true;
+      s.src = src;
+      document.body.appendChild(s);
+    }
+  }, [ok, adsterra.socialBar, adsterra.popunder]);
+
+  // Withdrawn consent after the scripts ran: reload so they are gone.
+  useEffect(() => {
+    const onChange = () => {
+      if (document.getElementById("adsterra-social") || document.getElementById("adsterra-pop")) {
+        if (!adsterraAllowed()) window.location.reload();
+      }
+    };
+    window.addEventListener(CONSENT_EVENT, onChange);
+    return () => window.removeEventListener(CONSENT_EVENT, onChange);
+  }, []);
+  return null;
+}

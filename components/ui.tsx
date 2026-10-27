@@ -8,9 +8,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { CONSENT_KEY, readConsent, saveConsent, useAdsMode } from "@/components/consent";
+import { CONSENT_KEY, readConsent, saveConsent, useAdsMode, useAdsterraOk } from "@/components/consent";
 import { useSite } from "@/components/site-context";
-import type { AdSlotKey } from "@/lib/site";
+import { splitBanner, type AdSlotKey } from "@/lib/site";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -141,14 +141,50 @@ type AdSlotProps = {
   className?: string;
 };
 
+/** One Adsterra banner, isolated in a sandboxed iframe so its global settings never clash with other banners or touch the site. */
+function AdsterraBanner({ banner, className }: { banner: { key: string; w: number; h: number; src: string }; className?: string }) {
+  const box = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  useEffect(() => {
+    const el = box.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => setScale(Math.min(1, el.clientWidth / banner.w) || 1));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [banner.w]);
+  const doc =
+    `<!doctype html><html><body style="margin:0;overflow:hidden"><script>atOptions={'key':'${banner.key}','format':'iframe','height':${banner.h},'width':${banner.w},'params':{}};</script>` +
+    `<script src="${banner.src}"></script></body></html>`;
+  return (
+    <aside aria-label="Advertisement" className={cx("w-full", className)}>
+      <p className="mb-1 text-center text-[10px] font-medium uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500">Advertisement</p>
+      <div ref={box} className="mx-auto w-full overflow-hidden" style={{ maxWidth: banner.w, height: banner.h * scale }}>
+        <iframe
+          title="Advertisement"
+          srcDoc={doc}
+          width={banner.w}
+          height={banner.h}
+          scrolling="no"
+          loading="lazy"
+          sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
+          style={{ border: 0, display: "block", transformOrigin: "0 0", transform: `scale(${scale})` }}
+        />
+      </div>
+    </aside>
+  );
+}
+
 export function AdSlot({ slot: slotKey, hint, minHeight, format = "auto", className }: AdSlotProps) {
   const ref = useRef<HTMLModElement>(null);
   const mode = useAdsMode();
+  const astOk = useAdsterraOk();
   const site = useSite();
+  const astRaw = site.adsterra?.banners?.[slotKey] ?? "";
+  const ast = astRaw ? splitBanner(astRaw) : null;
   const ADSENSE_CLIENT = site.adsenseClient;
   const slot = site.adSlots[slotKey] ?? "";
   // No ad (and no reserved space) until the visitor's region/consent allows ads.
-  const live = Boolean(ADSENSE_CLIENT && slot && mode !== "off");
+  const live = !ast && Boolean(ADSENSE_CLIENT && slot && mode !== "off");
 
   useEffect(() => {
     if (!live) return;
@@ -167,6 +203,8 @@ export function AdSlot({ slot: slotKey, hint, minHeight, format = "auto", classN
     }
   }, [live, mode]);
 
+  // An Adsterra banner set for this placement takes it over (shown only after consent).
+  if (ast) return astOk ? <AdsterraBanner banner={ast} className={className} /> : null;
   if (!live && !(SHOW_PLACEHOLDERS && (!ADSENSE_CLIENT || !slot))) return null;
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import type { PublicSite } from "@/lib/site";
+import { EMPTY_ADSTERRA, type PublicSite } from "@/lib/site";
 
 /*
  * Site settings for client components (name, logo, ad IDs...). The root layout
@@ -16,6 +16,7 @@ export const DEFAULT_SITE: PublicSite = {
   adsenseClient: "",
   adSlots: { leaderboard: "", skyLeft: "", skyRight: "", processing: "", result: "", footer: "", belowTools: "" },
   useGoogleCmp: false,
+  adsterra: EMPTY_ADSTERRA,
 };
 
 const Ctx = createContext<PublicSite>(DEFAULT_SITE);
